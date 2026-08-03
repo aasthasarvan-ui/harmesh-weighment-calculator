@@ -1,0 +1,467 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Harmesh Weighment Calculator</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f2f2f2;
+padding:15px;
+}
+
+.box{
+max-width:450px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 10px #aaa;
+}
+
+h2{
+text-align:center;
+}
+
+input,select,button{
+
+width:100%;
+padding:12px;
+margin:8px 0;
+font-size:18px;
+border-radius:8px;
+}
+
+button{
+background:#0066ff;
+color:white;
+border:none;
+}
+
+.result{
+
+background:#d9ffd9;
+padding:20px;
+text-align:center;
+font-size:24px;
+font-weight:bold;
+border-radius:10px;
+
+}
+
+footer{
+
+text-align:center;
+margin-top:20px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="box">
+
+
+<h2>
+Weighment Calculator
+</h2>
+
+
+
+<div id="loginBox">
+
+
+<input id="email"
+type="email"
+placeholder="Enter Email">
+
+
+<button onclick="sendMail()">
+Send Email OTP
+</button>
+
+
+<p id="status"></p>
+
+
+</div>
+
+
+
+
+<div id="app"
+style="display:none">
+
+
+<select id="sku1" onchange="calc()">
+
+<option value="50.120">
+50.120 KG
+</option>
+
+<option value="25.120">
+25.120 KG
+</option>
+
+</select>
+
+
+<input id="bags1"
+type="number"
+placeholder="Bags 1"
+oninput="calc()">
+
+
+
+<select id="sku2" onchange="calc()">
+
+<option value="50.120">
+50.120 KG
+</option>
+
+<option value="25.120">
+25.120 KG
+</option>
+
+</select>
+
+
+<input id="bags2"
+type="number"
+placeholder="Bags 2"
+oninput="calc()">
+
+
+
+<div class="result">
+
+TOTAL
+
+<br>
+
+<span id="total">
+0.000 KG
+</span>
+
+<br><br>
+
+TOTAL BAGS :
+
+<span id="bags">
+0
+</span>
+
+
+</div>
+
+
+<button onclick="resetData()">
+RESET
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+<footer>
+
+© 2026 Harmesh Kumar<br>
+All Rights Reserved
+
+</footer>
+
+
+
+<script type="module">
+
+
+import {initializeApp}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+
+
+import {
+
+getAuth,
+sendSignInLinkToEmail,
+isSignInWithEmailLink,
+signInWithEmailLink
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
+
+import {
+
+getDatabase,
+ref,
+set,
+get
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
+
+
+
+const firebaseConfig={
+
+
+apiKey:"AIzaSyBleiQ6oSse-mF00_rd7keZGN93r_Eorwc",
+
+authDomain:"mobil-otp-verification.firebaseapp.com",
+
+databaseURL:
+"https://mobil-otp-verification-default-rtdb.firebaseio.com",
+
+projectId:"mobil-otp-verification",
+
+storageBucket:
+"mobil-otp-verification.firebasestorage.app",
+
+messagingSenderId:"562891080486",
+
+appId:"1:562891080486:web:3adcc0c00a5785f88437e7"
+
+};
+
+
+
+
+
+const app=initializeApp(firebaseConfig);
+
+
+const auth=getAuth(app);
+
+
+const db=getDatabase(app);
+
+
+
+
+
+const actionCodeSettings={
+
+url:
+"https://aasthasarvan-ui.github.io/",
+
+handleCodeInApp:true
+
+};
+
+
+
+
+
+window.sendMail=async()=>{
+
+
+let email=
+document.getElementById("email").value;
+
+
+try{
+
+
+await sendSignInLinkToEmail(
+
+auth,
+
+email,
+
+actionCodeSettings
+
+);
+
+
+localStorage.setItem(
+"emailForSignIn",
+email
+);
+
+
+document.getElementById("status").innerHTML=
+"Email sent. Check your inbox";
+
+
+}
+
+catch(e){
+
+alert(e.message);
+
+}
+
+
+};
+
+
+
+
+
+
+
+
+async function checkLogin(){
+
+
+if(isSignInWithEmailLink(auth,window.location.href)){
+
+
+let email=
+localStorage.getItem("emailForSignIn");
+
+
+let result=
+
+await signInWithEmailLink(
+
+auth,
+
+email,
+
+window.location.href
+
+);
+
+
+
+let uid=result.user.uid;
+
+
+
+let deviceID=navigator.userAgent;
+
+
+
+let deviceRef=
+ref(db,"devices/"+uid);
+
+
+
+let old=await get(deviceRef);
+
+
+
+if(old.exists()){
+
+
+if(old.val().deviceID!=deviceID){
+
+
+alert("Device Not Authorized");
+
+return;
+
+}
+
+}
+
+else{
+
+
+await set(deviceRef,{
+
+email:email,
+
+deviceID:deviceID,
+
+date:new Date().toString()
+
+});
+
+
+}
+
+
+
+document.getElementById("loginBox")
+.style.display="none";
+
+
+document.getElementById("app")
+.style.display="block";
+
+
+}
+
+
+}
+
+
+checkLogin();
+
+
+
+
+
+
+
+
+window.calc=()=>{
+
+
+let total=
+
+(Number(sku1.value)*Number(bags1.value||0))
+
++
+
+(Number(sku2.value)*Number(bags2.value||0));
+
+
+
+document.getElementById("total")
+.innerHTML=
+total.toFixed(3)+" KG";
+
+
+
+document.getElementById("bags")
+.innerHTML=
+
+Number(bags1.value||0)
++
+Number(bags2.value||0);
+
+
+}
+
+
+
+
+
+window.resetData=()=>{
+
+bags1.value="";
+bags2.value="";
+
+calc();
+
+}
+
+
+</script>
+
+
+</body>
+</html>
