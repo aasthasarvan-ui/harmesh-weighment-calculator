@@ -1,245 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Harmesh Weighment Calculator</title>
 
+<meta name="theme-color" content="#1565C0">
 
-<style>
+<link rel="manifest" href="manifest.json">
 
-*{
-box-sizing:border-box;
-}
-
-
-body{
-
-margin:0;
-padding:15px;
-
-font-family:Arial, sans-serif;
-
-background:#f1f3f6;
-
-}
-
-
-.box{
-
-width:100%;
-max-width:420px;
-
-margin:30px auto;
-
-background:white;
-
-padding:22px;
-
-border-radius:18px;
-
-box-shadow:0 4px 15px rgba(0,0,0,0.15);
-
-}
-
-
-h2{
-
-text-align:center;
-
-margin-bottom:20px;
-
-color:#333;
-
-}
-
-
-
-input,
-select,
-button{
-
-width:100%;
-
-height:48px;
-
-padding:10px 12px;
-
-margin-bottom:12px;
-
-font-size:17px;
-
-border-radius:10px;
-
-border:1px solid #bbb;
-
-}
-
-
-
-button{
-
-background:#0066ff;
-
-color:white;
-
-border:none;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-
-
-button:active{
-
-transform:scale(0.98);
-
-}
-
-
-
-#status{
-
-text-align:center;
-
-color:#0066ff;
-
-font-size:15px;
-
-}
-
-
-
-.row{
-
-display:flex;
-
-gap:10px;
-
-}
-
-
-
-.row select,
-.row input{
-
-width:50%;
-
-}
-
-
-
-.result{
-
-
-margin-top:15px;
-
-background:#d9ffd9;
-
-border-radius:12px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:24px;
-
-font-weight:bold;
-
-color:#145214;
-
-
-}
-
-
-
-.small{
-
-font-size:18px;
-
-}
-
-
-
-footer{
-
-text-align:center;
-
-font-size:13px;
-
-color:#666;
-
-margin-top:20px;
-
-}
-
-
-
-@media(max-width:400px){
-
-.box{
-
-padding:18px;
-
-}
-
-.result{
-
-font-size:21px;
-
-}
-
-}
-
-
-
-</style>
-
+<link rel="stylesheet" href="style.css">
 
 </head>
 
-
-
 <body>
 
+<div id="loadingScreen" class="screen">
+
+<div class="card">
+
+<h2>Loading...</h2>
+
+<p>Please wait</p>
+
+</div>
+
+</div>
 
 
-<div class="box">
+
+<div id="loginScreen" class="screen hide">
+
+<div class="card">
+
+<h1>⚖️</h1>
+
+<h2>Weighment Calculator</h2>
+
+<p class="sub">
+
+Secure Email Verification
+
+</p>
 
 
-
-<h2>
-⚖️ Weighment Calculator
-</h2>
-
-
-
-
-<div id="loginBox">
-
-
-<input 
-id="email"
+<input
 type="email"
-placeholder="Enter Email Address">
+id="email"
+placeholder="Enter your Email">
 
 
-<button onclick="sendMail()">
+<button id="sendLinkBtn">
 
 Send Verification Link
 
 </button>
 
 
+<p id="loginMessage"></p>
 
-<p id="status"></p>
-
-
+</div>
 
 </div>
 
@@ -247,16 +70,21 @@ Send Verification Link
 
 
 
+<div id="calculatorScreen" class="screen hide">
 
-<div id="appBox" style="display:none">
+<div class="card">
+
+<h2>
+
+Weighment Calculator
+
+</h2>
 
 
 
 <div class="row">
 
-
-<select id="sku1" onchange="calc()">
-
+<select id="sku1">
 
 <option value="50.120">
 
@@ -264,28 +92,19 @@ Send Verification Link
 
 </option>
 
-
 <option value="25.120">
 
 25.120 KG
 
 </option>
 
-
 </select>
 
 
-
 <input
-
+type="number"
 id="bags1"
-
-type="number"
-
-placeholder="Bags 1"
-
-oninput="calc()">
-
+placeholder="Bags">
 
 </div>
 
@@ -295,9 +114,7 @@ oninput="calc()">
 
 <div class="row">
 
-
-<select id="sku2" onchange="calc()">
-
+<select id="sku2">
 
 <option value="50.120">
 
@@ -305,28 +122,19 @@ oninput="calc()">
 
 </option>
 
-
 <option value="25.120">
 
 25.120 KG
 
 </option>
 
-
 </select>
 
 
-
 <input
-
-id="bags2"
-
 type="number"
-
-placeholder="Bags 2"
-
-oninput="calc()">
-
+id="bags2"
+placeholder="Bags">
 
 </div>
 
@@ -336,29 +144,23 @@ oninput="calc()">
 
 <div class="result">
 
+<h3>Total Weight</h3>
 
-TOTAL WEIGHT
-
-<br>
-
-
-<span id="total">
+<div id="totalWeight">
 
 0.000 KG
 
-</span>
+</div>
+
+</div>
 
 
 
-<br><br>
 
 
-<span class="small">
+<div class="bags">
 
-TOTAL BAGS :
-
-</span>
-
+Total Bags :
 
 <span id="totalBags">
 
@@ -366,13 +168,12 @@ TOTAL BAGS :
 
 </span>
 
-
-
 </div>
 
 
 
-<button onclick="resetData()">
+
+<button id="resetBtn">
 
 RESET
 
@@ -382,9 +183,6 @@ RESET
 
 </div>
 
-
-
-
 </div>
 
 
@@ -392,7 +190,10 @@ RESET
 
 <footer>
 
-© 2026 Harmesh Kumar<br>
+© 2026 Harmesh Kumar
+
+<br>
+
 All Rights Reserved
 
 </footer>
@@ -400,449 +201,9 @@ All Rights Reserved
 
 
 
+<script type="module" src="firebase.js"></script>
 
-
-
-<script type="module">
-
-
-
-import {initializeApp}
-
-from 
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-
-
-import {
-
-
-getAuth,
-
-sendSignInLinkToEmail,
-
-isSignInWithEmailLink,
-
-signInWithEmailLink
-
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-
-
-
-
-import {
-
-
-getDatabase,
-
-ref,
-
-set,
-
-get
-
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-
-
-
-
-
-
-
-const firebaseConfig={
-
-
-apiKey:"AIzaSyBleiQ6oSse-mF00_rd7keZGN93r_Eorwc",
-
-
-authDomain:"mobil-otp-verification.firebaseapp.com",
-
-
-databaseURL:"https://mobil-otp-verification-default-rtdb.firebaseio.com",
-
-
-projectId:"mobil-otp-verification",
-
-
-storageBucket:"mobil-otp-verification.firebasestorage.app",
-
-
-messagingSenderId:"562891080486",
-
-
-appId:"1:562891080486:web:3adcc0c00a5785f88437e7"
-
-};
-
-
-
-
-
-
-const app=initializeApp(firebaseConfig);
-
-
-const auth=getAuth(app);
-
-
-const db=getDatabase(app);
-
-
-
-
-
-
-
-const actionCodeSettings={
-
-
-url:
-
-"https://aasthasarvan-ui.github.io/harmesh-weighment-calculator/",
-
-
-handleCodeInApp:true
-
-
-};
-
-
-
-
-
-
-
-
-
-window.sendMail=async function(){
-
-
-
-let email=document.getElementById("email").value;
-
-
-
-if(!email){
-
-alert("Enter Email");
-
-return;
-
-}
-
-
-
-try{
-
-
-await sendSignInLinkToEmail(
-
-auth,
-
-email,
-
-actionCodeSettings
-
-);
-
-
-
-localStorage.setItem(
-
-"emailForSignIn",
-
-email
-
-);
-
-
-
-document.getElementById("status").innerHTML=
-
-"Verification link sent. Check your email";
-
-
-}
-
-
-catch(e){
-
-
-alert(e.message);
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-
-
-async function checkLogin(){
-
-
-
-if(isSignInWithEmailLink(auth,window.location.href)){
-
-
-
-let email=
-
-localStorage.getItem("emailForSignIn");
-
-
-
-if(!email){
-
-
-email=prompt(
-
-"Enter your email"
-
-);
-
-
-}
-
-
-
-try{
-
-
-
-let result=
-
-await signInWithEmailLink(
-
-auth,
-
-email,
-
-window.location.href
-
-);
-
-
-
-
-
-localStorage.setItem(
-
-"emailForSignIn",
-
-email
-
-);
-
-
-
-
-
-let uid=result.user.uid;
-
-
-let deviceID=navigator.userAgent;
-
-
-
-let deviceRef=
-
-ref(
-
-db,
-
-"devices/"+uid
-
-);
-
-
-
-
-let old=
-
-await get(deviceRef);
-
-
-
-
-
-
-if(old.exists()){
-
-
-
-if(old.val().deviceID!==deviceID){
-
-
-alert(
-
-"This Device Is Not Authorized"
-
-);
-
-
-return;
-
-
-}
-
-
-}
-
-else{
-
-
-await set(deviceRef,{
-
-email:email,
-
-deviceID:deviceID,
-
-date:new Date().toString()
-
-
-});
-
-
-}
-
-
-
-
-
-
-document.getElementById("loginBox")
-
-.style.display="none";
-
-
-
-document.getElementById("appBox")
-
-.style.display="block";
-
-
-
-}
-
-catch(e){
-
-
-alert(e.message);
-
-
-}
-
-
-
-}
-
-
-}
-
-
-
-
-checkLogin();
-
-
-
-
-
-
-
-
-
-window.calc=function(){
-
-
-
-let total=
-
-
-
-(Number(sku1.value)*Number(bags1.value||0))
-
-
-+
-
-(Number(sku2.value)*Number(bags2.value||0));
-
-
-
-
-
-document.getElementById("total")
-
-.innerHTML=
-
-total.toFixed(3)+" KG";
-
-
-
-
-
-document.getElementById("totalBags")
-
-.innerHTML=
-
-
-Number(bags1.value||0)
-
-+
-
-Number(bags2.value||0);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-window.resetData=function(){
-
-
-bags1.value="";
-
-bags2.value="";
-
-
-calc();
-
-
-}
-
-
-
-
-</script>
-
+<script type="module" src="app.js"></script>
 
 </body>
 
