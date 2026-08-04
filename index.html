@@ -4,11 +4,9 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Harmesh Weighment Calculator</title>
-
-<meta name="theme-color" content="#1565C0">
 
 <link rel="manifest" href="manifest.json">
 
@@ -16,7 +14,9 @@
 
 </head>
 
+
 <body>
+
 
 <div id="loadingScreen" class="screen">
 
@@ -32,25 +32,34 @@
 
 
 
+
 <div id="loginScreen" class="screen hide">
+
 
 <div class="card">
 
+
 <h1>⚖️</h1>
 
-<h2>Weighment Calculator</h2>
+<h2>
+Weighment Calculator
+</h2>
+
 
 <p class="sub">
-
-Secure Email Verification
-
+Secure Login
 </p>
 
 
+
 <input
+
 type="email"
+
 id="email"
-placeholder="Enter your Email">
+
+placeholder="Enter Email Address">
+
 
 
 <button id="sendLinkBtn">
@@ -59,20 +68,44 @@ Send Verification Link
 
 </button>
 
+
+
+<hr>
+
+
+<p style="text-align:center">
+OR
+</p>
+
+
+
 <input
+
 type="password"
+
 id="pin"
+
 placeholder="Enter PIN">
 
 
+
 <button id="pinBtn">
+
 Open With PIN
+
 </button>
+
+
+
 <p id="loginMessage"></p>
 
+
 </div>
 
 </div>
+
+
+
 
 
 
@@ -80,39 +113,45 @@ Open With PIN
 
 <div id="calculatorScreen" class="screen hide">
 
+
 <div class="card">
 
+
 <h2>
-
 Weighment Calculator
-
 </h2>
 
 
 
+
 <div class="row">
+
 
 <select id="sku1">
 
+
 <option value="50.120">
-
 50.120 KG
-
 </option>
+
 
 <option value="25.120">
-
 25.120 KG
-
 </option>
+
 
 </select>
 
 
+
 <input
+
 type="number"
+
 id="bags1"
-placeholder="Bags">
+
+placeholder="Bags 1">
+
 
 </div>
 
@@ -122,29 +161,35 @@ placeholder="Bags">
 
 <div class="row">
 
+
 <select id="sku2">
 
+
 <option value="50.120">
-
 50.120 KG
-
 </option>
+
 
 <option value="25.120">
-
 25.120 KG
-
 </option>
+
 
 </select>
 
 
+
 <input
+
 type="number"
+
 id="bags2"
-placeholder="Bags">
+
+placeholder="Bags 2">
+
 
 </div>
+
 
 
 
@@ -152,13 +197,18 @@ placeholder="Bags">
 
 <div class="result">
 
-<h3>Total Weight</h3>
+
+<h3>
+Total Weight
+</h3>
+
 
 <div id="totalWeight">
 
 0.000 KG
 
 </div>
+
 
 </div>
 
@@ -168,6 +218,7 @@ placeholder="Bags">
 
 <div class="bags">
 
+
 Total Bags :
 
 <span id="totalBags">
@@ -175,6 +226,7 @@ Total Bags :
 0
 
 </span>
+
 
 </div>
 
@@ -196,6 +248,7 @@ RESET
 
 
 
+
 <footer>
 
 © 2026 Harmesh Kumar
@@ -212,6 +265,8 @@ All Rights Reserved
 <script type="module" src="firebase.js"></script>
 
 <script type="module" src="app.js"></script>
+
+
 
 </body>
 
