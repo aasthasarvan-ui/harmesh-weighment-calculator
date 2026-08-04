@@ -19,6 +19,8 @@ from
 
 
 
+// GitHub URL
+
 const actionCodeSettings = {
 
 url:
@@ -27,6 +29,13 @@ url:
 handleCodeInApp:true
 
 };
+
+
+
+
+// Backup PIN
+
+const MASTER_PIN = "1234";
 
 
 
@@ -50,125 +59,112 @@ document
 
 
 
-// Multiple Device Lock (Max 3 Devices)
+
+// Device Lock - Maximum 10 Devices
 
 async function deviceLock(id,email){
 
 
-let deviceID =
-btoa(navigator.userAgent);
+let deviceID = btoa(
+
+navigator.userAgent +
+screen.width +
+screen.height
+
+);
 
 
 
-let deviceRef =
-ref(database,"devices/"+id);
+let deviceRef = ref(
+
+database,
+"devices/"+id
+
+);
 
 
 
-let data =
-await get(deviceRef);
+let data = await get(deviceRef);
 
 
 
-if(!data.exists()){
+
+
+if(data.exists()){
+
+
+let devices = data.val().devices || [];
+
+
+
+// Existing Device
+
+if(devices.includes(deviceID)){
+
+
+return;
+
+
+}
+
+
+
+// New Device
+
+if(devices.length >= 10){
+
+
+throw new Error(
+
+"Maximum 10 devices allowed"
+
+);
+
+
+}
+
+
+
+devices.push(deviceID);
+
 
 
 await set(deviceRef,{
 
-device_1:{
-
 email:email,
 
-deviceID:deviceID,
+devices:devices,
 
 date:new Date().toString()
-
-}
 
 });
 
 
-return;
-
 }
 
 
 
+else{
 
 
-let devices =
-data.val();
+await set(deviceRef,{
 
+email:email,
 
+devices:[deviceID],
 
-let alreadyExist=false;
-
-
-
-Object.keys(devices).forEach((key)=>{
-
-
-if(
-devices[key].deviceID === deviceID
-){
-
-alreadyExist=true;
-
-}
-
+date:new Date().toString()
 
 });
 
 
-
-if(alreadyExist){
-
-return;
-
 }
 
 
 
-
-
-let count =
-Object.keys(devices).length;
-
-
-
-if(count>=3){
-
-throw new Error(
-"Maximum 3 devices allowed"
-);
-
 }
 
 
-
-
-await set(
-
-ref(
-database,
-"devices/"+id+"/device_"+(count+1)
-),
-
-{
-
-email:email,
-
-deviceID:deviceID,
-
-date:new Date().toString()
-
-}
-
-);
-
-
-
-}
 
 
 
@@ -177,6 +173,7 @@ date:new Date().toString()
 
 
 // Send Email Link
+
 
 document
 .getElementById("sendLinkBtn")
@@ -191,13 +188,15 @@ document
 
 
 
-if(!email){
+if(email===""){
+
 
 alert("Enter Email");
 
 return;
 
 }
+
 
 
 
@@ -217,8 +216,11 @@ actionCodeSettings
 
 
 localStorage.setItem(
+
 "emailForSignIn",
+
 email
+
 );
 
 
@@ -226,14 +228,17 @@ email
 document
 .getElementById("loginMessage")
 .innerHTML =
-"Email link sent";
+
+"Email link sent. Check your mail";
 
 
 }
 
-catch(e){
+catch(error){
 
-alert(e.message);
+
+alert(error.message);
+
 
 }
 
@@ -248,70 +253,52 @@ alert(e.message);
 
 
 
-// PIN Login Firebase
+// PIN Login
+
 
 document
 .getElementById("pinBtn")
 .onclick = async ()=>{
 
 
-let enteredPIN =
-
+let pin =
 document
 .getElementById("pin")
-.value
-.trim();
+.value;
+
+
+
+
+if(pin === MASTER_PIN){
 
 
 
 try{
 
 
-let pinRef =
-ref(database,"settings/pin");
-
-
-
-let snap =
-await get(pinRef);
-
-
-
-if(!snap.exists()){
-
-alert("PIN not found");
-
-return;
-
-}
-
-
-
-let savedPIN =
-String(
-snap.val()
-)
-.trim();
-
-
-
-
-
-if(enteredPIN === savedPIN){
-
-
-
 await deviceLock(
 
 "pin_device",
 
-"PIN LOGIN"
+"PIN Login"
 
 );
 
 
 
 openCalculator();
+
+
+
+}
+
+catch(e){
+
+
+alert(e.message);
+
+
+}
 
 
 
@@ -326,14 +313,6 @@ alert("Wrong PIN");
 }
 
 
-}
-
-catch(e){
-
-alert(e.message);
-
-}
-
 
 };
 
@@ -347,7 +326,9 @@ alert(e.message);
 
 // Email Verification
 
+
 async function checkEmail(){
+
 
 
 if(
@@ -363,17 +344,26 @@ window.location.href
 ){
 
 
+
 let email =
 localStorage.getItem(
+
 "emailForSignIn"
+
 );
+
 
 
 
 if(!email){
 
-email =
-prompt("Enter Email");
+
+email = prompt(
+
+"Enter Email"
+
+);
+
 
 }
 
@@ -397,6 +387,8 @@ window.location.href
 
 
 
+
+
 await deviceLock(
 
 result.user.uid,
@@ -404,6 +396,7 @@ result.user.uid,
 email
 
 );
+
 
 
 
@@ -415,13 +408,16 @@ openCalculator();
 
 catch(e){
 
+
 alert(e.message);
 
-}
-
-
 
 }
+
+
+
+}
+
 
 
 }
@@ -436,30 +432,38 @@ alert(e.message);
 
 // Calculator
 
+
 function calculate(){
+
 
 
 let total =
 
 
-(Number(
+(
+Number(
 document.getElementById("sku1").value
 )
 *
 Number(
 document.getElementById("bags1").value || 0
-))
+)
+)
 
 
 +
 
-(Number(
+(
+Number(
 document.getElementById("sku2").value
 )
 *
 Number(
 document.getElementById("bags2").value || 0
-));
+)
+);
+
+
 
 
 
@@ -468,6 +472,8 @@ document
 .innerHTML =
 
 total.toFixed(3)+" KG";
+
+
 
 
 
@@ -487,30 +493,39 @@ document.getElementById("bags2").value || 0
 );
 
 
+
 }
 
 
 
 
 
+
+
+
+// Auto Calculation
+
+
 document
 .getElementById("sku1")
-.onchange=calculate;
+.onchange = calculate;
 
 
 document
 .getElementById("sku2")
-.onchange=calculate;
+.onchange = calculate;
 
 
 document
 .getElementById("bags1")
-.oninput=calculate;
+.oninput = calculate;
 
 
 document
 .getElementById("bags2")
-.oninput=calculate;
+.oninput = calculate;
+
+
 
 
 
@@ -520,9 +535,10 @@ document
 
 // Reset
 
+
 document
 .getElementById("resetBtn")
-.onclick=()=>{
+.onclick = ()=>{
 
 
 document
@@ -547,14 +563,7 @@ calculate();
 
 
 
+
+// Start Check
+
 checkEmail();
-
-
-
-if("serviceWorker" in navigator){
-
-navigator.serviceWorker.register(
-"service-worker.js"
-);
-
-}
