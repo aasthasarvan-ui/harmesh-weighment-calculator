@@ -26,34 +26,47 @@ function openCalculator() {
 }
 
 
-// Device Lock (Fixed: Ab userAgent ki jagah localStorage use karega)
+// LocalStorage se Device ID lana ya nayi banana
 function getDeviceID() {
   let id = localStorage.getItem("my_device_id");
   if (!id) {
-      // Agar first time hai, toh ek random ID generate karein
       id = "device_" + Math.random().toString(36).substr(2, 9);
       localStorage.setItem("my_device_id", id);
   }
   return id;
 }
 
-async function deviceLock(id, email) {
-  let deviceID = getDeviceID(); 
-  let deviceRef = ref(database, "devices/" + id);
-  
-  let data = await get(deviceRef);
 
-  if (data.exists()) {
-    if (data.val().deviceID !== deviceID) {
-      throw new Error("Device Not Authorized");
+// 🚀 NAYA LOGIC: Up to 10 Devices Lock
+async function deviceLock(userId, email) {
+  let currentDeviceID = getDeviceID(); 
+  
+  // Database mein user ke devices ka path
+  let userDevicesRef = ref(database, "devices/" + userId);
+  let snapshot = await get(userDevicesRef);
+
+  if (snapshot.exists()) {
+    let devicesData = snapshot.val();
+    let registeredDeviceIDs = Object.keys(devicesData);
+
+    // 1. Check karein ki ye device pehle se saved hai ya nahi
+    if (registeredDeviceIDs.includes(currentDeviceID)) {
+        // Device registered hai, safely return (Login ho jayega)
+        return;
     }
-  } else {
-    await set(deviceRef, {
-      email: email,
-      deviceID: deviceID,
-      date: new Date().toString()
-    });
+
+    // 2. Agar saved nahi hai, toh check karein kya limit 10 ho chuki hai?
+    if (registeredDeviceIDs.length >= 10) {
+        throw new Error("Maximum 10 devices limit reached. Cannot authorize new device.");
+    }
   }
+  
+  // 3. Agar limit bachi hai (ya 1st device hai), toh database me naya device add karein
+  let newDeviceRef = ref(database, "devices/" + userId + "/" + currentDeviceID);
+  await set(newDeviceRef, {
+      email: email,
+      date: new Date().toString()
+  });
 }
 
 
@@ -76,7 +89,7 @@ document.getElementById("sendLinkBtn").onclick = async () => {
 };
 
 
-// PIN Login (Fixed: Ab ye Firebase Database se PIN check karega)
+// PIN Login 
 document.getElementById("pinBtn").onclick = async () => {
   let pinInput = document.getElementById("pin").value.trim();
 
@@ -90,7 +103,6 @@ document.getElementById("pinBtn").onclick = async () => {
       let snapshot = await get(pinRef);
 
       if (snapshot.exists()) {
-          // Firebase se mila hua PIN
           let dbPin = String(snapshot.val()); 
 
           if (pinInput === dbPin) {
@@ -128,10 +140,9 @@ async function checkEmail() {
 }
 
 
-// Calculator (Fixed: Ab NaN ka error nahi aayega agar input khali ho)
+// Calculator 
 function calculate() {
   
-  // Helper function: Khali string ya galat input ko 0 maan lega
   const getNumber = (id) => {
       let val = Number(document.getElementById(id).value);
       return isNaN(val) ? 0 : val;
@@ -159,7 +170,7 @@ document.getElementById("bags2").oninput = calculate;
 document.getElementById("resetBtn").onclick = () => {
   document.getElementById("bags1").value = "";
   document.getElementById("bags2").value = "";
-  calculate(); // Ek baar wapas call karenge taaki total 0 ho jaye
+  calculate(); 
 };
 
 // Init
