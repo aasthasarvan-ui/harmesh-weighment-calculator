@@ -31,6 +31,7 @@ handleCodeInApp:true
 
 
 
+// Open Calculator
 
 function openCalculator(){
 
@@ -57,9 +58,7 @@ async function deviceLock(id,email){
 
 
 let deviceID =
-btoa(
-navigator.userAgent
-);
+btoa(navigator.userAgent);
 
 
 
@@ -68,18 +67,18 @@ ref(database,"devices/"+id);
 
 
 
-let data =
+let snap =
 await get(deviceRef);
 
 
 
-if(data.exists()){
+if(snap.exists()){
 
 
-if(data.val().deviceID !== deviceID){
+if(snap.val().deviceID !== deviceID){
 
 throw new Error(
-"Another device is already registered"
+"Device not authorized"
 );
 
 }
@@ -113,8 +112,8 @@ date:new Date().toString()
 
 
 
-// Send Email Link
 
+// Email Link Send
 
 document
 .getElementById("sendLinkBtn")
@@ -122,8 +121,7 @@ document
 
 
 let email =
-document
-.getElementById("email")
+document.getElementById("email")
 .value.trim();
 
 
@@ -135,7 +133,6 @@ alert("Enter Email");
 return;
 
 }
-
 
 
 try{
@@ -150,7 +147,6 @@ email,
 actionCodeSettings
 
 );
-
 
 
 localStorage.setItem(
@@ -185,8 +181,7 @@ alert(e.message);
 
 
 
-// PIN Login from Firebase
-
+// Firebase PIN Login
 
 document
 .getElementById("pinBtn")
@@ -197,7 +192,8 @@ let enteredPIN =
 
 document
 .getElementById("pin")
-.value;
+.value
+.trim();
 
 
 
@@ -214,8 +210,19 @@ await get(pinRef);
 
 
 
+if(!snap.exists()){
+
+alert("PIN not found in Firebase");
+
+return;
+
+}
+
+
+
 let savedPIN =
-snap.val();
+
+String(snap.val()).trim();
 
 
 
@@ -250,6 +257,7 @@ alert("Wrong PIN");
 }
 
 
+
 }
 
 catch(e){
@@ -257,7 +265,6 @@ catch(e){
 alert(e.message);
 
 }
-
 
 
 };
@@ -270,8 +277,7 @@ alert(e.message);
 
 
 
-// Email Verify
-
+// Email Verification
 
 async function checkEmail(){
 
@@ -288,6 +294,7 @@ window.location.href
 )
 
 ){
+
 
 
 let email =
@@ -350,7 +357,6 @@ alert(e.message);
 }
 
 
-
 }
 
 
@@ -363,8 +369,8 @@ alert(e.message);
 
 // Calculator
 
-
 function calculate(){
+
 
 
 let total =
@@ -392,10 +398,13 @@ document.getElementById("bags2").value || 0
 
 
 
+
 document
 .getElementById("totalWeight")
 .innerHTML =
+
 total.toFixed(3)+" KG";
+
 
 
 
@@ -404,10 +413,13 @@ document
 .getElementById("totalBags")
 .innerHTML =
 
+
 Number(
 document.getElementById("bags1").value || 0
 )
+
 +
+
 Number(
 document.getElementById("bags2").value || 0
 );
@@ -423,22 +435,23 @@ document.getElementById("bags2").value || 0
 
 document
 .getElementById("sku1")
-.onchange=calculate;
+.onchange = calculate;
 
 
 document
 .getElementById("sku2")
-.onchange=calculate;
+.onchange = calculate;
 
 
 document
 .getElementById("bags1")
-.oninput=calculate;
+.oninput = calculate;
 
 
 document
 .getElementById("bags2")
-.oninput=calculate;
+.oninput = calculate;
+
 
 
 
@@ -449,12 +462,18 @@ document
 
 document
 .getElementById("resetBtn")
-.onclick=()=>{
+.onclick = ()=>{
 
 
-document.getElementById("bags1").value="";
+document
+.getElementById("bags1")
+.value="";
 
-document.getElementById("bags2").value="";
+
+document
+.getElementById("bags2")
+.value="";
+
 
 calculate();
 
