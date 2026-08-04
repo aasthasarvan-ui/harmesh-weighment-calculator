@@ -1,34 +1,47 @@
 import { auth, database } from "./firebase.js";
 
+
 import {
+
 sendSignInLinkToEmail,
 isSignInWithEmailLink,
 signInWithEmailLink
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
+
 import {
+
 ref,
 set,
 get
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 
 
-// GitHub Pages URL
+
+// GitHub URL
 
 const actionCodeSettings = {
 
 url:
+
 "https://aasthasarvan-ui.github.io/harmesh-weighment-calculator/",
 
 handleCodeInApp:true
 
 };
+
 
 
 
@@ -39,20 +52,20 @@ const MASTER_PIN = "1234";
 
 
 
-// Open Calculator
+// Screen Change
 
 function openCalculator(){
 
-document.getElementById("loadingScreen")
+
+document
+.getElementById("loginScreen")
 .classList.add("hide");
 
 
-document.getElementById("loginScreen")
-.classList.add("hide");
-
-
-document.getElementById("calculatorScreen")
+document
+.getElementById("calculatorScreen")
 .classList.remove("hide");
+
 
 }
 
@@ -60,9 +73,10 @@ document.getElementById("calculatorScreen")
 
 
 
-// Device Lock Function
 
-async function deviceLock(uid,email){
+// Device Lock
+
+async function deviceLock(id,email){
 
 
 let deviceID =
@@ -71,7 +85,7 @@ btoa(navigator.userAgent);
 
 
 let deviceRef =
-ref(database,"devices/"+uid);
+ref(database,"devices/"+id);
 
 
 
@@ -80,14 +94,17 @@ await get(deviceRef);
 
 
 
+
 if(data.exists()){
 
 
 if(data.val().deviceID !== deviceID){
 
+
 throw new Error(
-"This device is not authorized"
+"Device Not Authorized"
 );
+
 
 }
 
@@ -120,6 +137,7 @@ date:new Date().toString()
 
 
 
+
 // Email Link Send
 
 
@@ -132,11 +150,15 @@ let email =
 document.getElementById("email").value.trim();
 
 
-if(!email){
+
+if(email===""){
+
 
 alert("Enter Email");
 
+
 return;
+
 
 }
 
@@ -169,14 +191,16 @@ email
 
 document.getElementById("loginMessage")
 .innerHTML =
-"Verification link sent. Check your email";
+"Email link sent. Check your mail";
 
 
 }
 
-catch(e){
+catch(error){
 
-alert(e.message);
+
+alert(error.message);
+
 
 }
 
@@ -202,11 +226,8 @@ let pin =
 document.getElementById("pin").value;
 
 
+
 if(pin === MASTER_PIN){
-
-
-
-let uid = "pin_user";
 
 
 try{
@@ -214,9 +235,9 @@ try{
 
 await deviceLock(
 
-uid,
+"pin_device",
 
-"PIN LOGIN"
+"PIN Login"
 
 );
 
@@ -229,7 +250,9 @@ openCalculator();
 
 catch(e){
 
+
 alert(e.message);
+
 
 }
 
@@ -256,11 +279,10 @@ alert("Wrong PIN");
 
 
 
+// Email Verification Check
 
-// Email Link Verify
 
-
-async function checkEmailLogin(){
+async function checkEmail(){
 
 
 
@@ -290,11 +312,12 @@ if(!email){
 
 email =
 prompt(
-"Enter your email"
+"Enter Email"
 );
 
 
 }
+
 
 
 
@@ -312,7 +335,6 @@ email,
 window.location.href
 
 );
-
 
 
 
@@ -344,24 +366,10 @@ alert(e.message);
 
 }
 
-else{
-
-
-document
-.getElementById("loadingScreen")
-.classList.add("hide");
-
-
-document
-.getElementById("loginScreen")
-.classList.remove("hide");
 
 
 }
 
-
-
-}
 
 
 
@@ -375,6 +383,7 @@ document
 function calculate(){
 
 
+
 let total =
 
 
@@ -383,4 +392,105 @@ document.getElementById("sku1").value
 )
 *
 Number(
-document.getElementById("bags1").value || 
+document.getElementById("bags1").value || 0
+))
+
+
++
+
+(Number(
+document.getElementById("sku2").value
+)
+*
+Number(
+document.getElementById("bags2").value || 0
+));
+
+
+
+
+
+document
+.getElementById("totalWeight")
+.innerHTML =
+
+total.toFixed(3)+" KG";
+
+
+
+
+
+document
+.getElementById("totalBags")
+.innerHTML =
+
+
+Number(
+document.getElementById("bags1").value || 0
+)
+
++
+
+Number(
+document.getElementById("bags2").value || 0
+);
+
+
+
+}
+
+
+
+
+
+
+
+document
+.getElementById("sku1")
+.onchange=calculate;
+
+
+document
+.getElementById("sku2")
+.onchange=calculate;
+
+
+document
+.getElementById("bags1")
+.oninput=calculate;
+
+
+document
+.getElementById("bags2")
+.oninput=calculate;
+
+
+
+
+
+
+
+// Reset
+
+
+document
+.getElementById("resetBtn")
+.onclick=()=>{
+
+
+document.getElementById("bags1").value="";
+
+document.getElementById("bags2").value="";
+
+calculate();
+
+
+};
+
+
+
+
+
+
+
+checkEmail();
