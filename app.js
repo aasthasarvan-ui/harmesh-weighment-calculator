@@ -1,21 +1,32 @@
 import { auth, database } from "./firebase.js";
 
+
 import {
+
 sendSignInLinkToEmail,
 isSignInWithEmailLink,
 signInWithEmailLink
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
+
 import {
+
 ref,
 set,
 get
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 
 
 
@@ -24,6 +35,7 @@ from
 const actionCodeSettings = {
 
 url:
+
 "https://aasthasarvan-ui.github.io/harmesh-weighment-calculator/",
 
 handleCodeInApp:true
@@ -33,15 +45,11 @@ handleCodeInApp:true
 
 
 
-// Backup PIN
 
-const MASTER_PIN = atob("MTIzNA==");
-
-
-
-// Open Calculator
+// Open Calculator Screen
 
 function openCalculator(){
+
 
 document
 .getElementById("loginScreen")
@@ -52,6 +60,7 @@ document
 .getElementById("calculatorScreen")
 .classList.remove("hide");
 
+
 }
 
 
@@ -59,27 +68,74 @@ document
 
 
 
-// Device Lock - Maximum 10 Devices
+
+// Firebase PIN Check
+
+async function checkPIN(inputPIN){
+
+
+let pinRef = ref(
+
+database,
+
+"settings/pin/value"
+
+);
+
+
+
+let snapshot = await get(pinRef);
+
+
+
+if(snapshot.exists()){
+
+
+return inputPIN === snapshot.val();
+
+
+}
+
+
+return false;
+
+
+}
+
+
+
+
+
+
+
+
+// Maximum 10 Device Lock
 
 async function deviceLock(id,email){
+
 
 
 let deviceID = btoa(
 
 navigator.userAgent +
+
 screen.width +
+
 screen.height
 
 );
 
 
 
+
 let deviceRef = ref(
 
 database,
+
 "devices/"+id
 
 );
+
 
 
 
@@ -92,11 +148,13 @@ let data = await get(deviceRef);
 if(data.exists()){
 
 
+
 let devices = data.val().devices || [];
 
 
 
-// Existing Device
+
+// Already Registered
 
 if(devices.includes(deviceID)){
 
@@ -108,7 +166,8 @@ return;
 
 
 
-// New Device
+
+// Maximum Limit
 
 if(devices.length >= 10){
 
@@ -124,7 +183,10 @@ throw new Error(
 
 
 
+
 devices.push(deviceID);
+
+
 
 
 
@@ -139,9 +201,8 @@ date:new Date().toString()
 });
 
 
+
 }
-
-
 
 else{
 
@@ -159,20 +220,9 @@ date:new Date().toString()
 
 }
 
-
-
 }
 
-
-
-
-
-
-
-
-
 // Send Email Link
-
 
 document
 .getElementById("sendLinkBtn")
@@ -194,8 +244,8 @@ alert("Enter Email");
 
 return;
 
-}
 
+}
 
 
 
@@ -254,7 +304,6 @@ alert(error.message);
 
 // PIN Login
 
-
 document
 .getElementById("pinBtn")
 .onclick = async ()=>{
@@ -267,12 +316,15 @@ document
 
 
 
-
-if(pin === MASTER_PIN){
-
-
-
 try{
+
+
+let valid = await checkPIN(pin);
+
+
+
+if(valid){
+
 
 
 await deviceLock(
@@ -291,22 +343,22 @@ openCalculator();
 
 }
 
-catch(e){
-
-
-alert(e.message);
-
-
-}
-
-
-
-}
-
 else{
 
 
 alert("Wrong PIN");
+
+
+}
+
+
+
+}
+
+catch(e){
+
+
+alert(e.message);
 
 
 }
@@ -323,8 +375,7 @@ alert("Wrong PIN");
 
 
 
-// Email Verification
-
+// Email Verification Check
 
 async function checkEmail(){
 
@@ -345,11 +396,13 @@ window.location.href
 
 
 let email =
+
 localStorage.getItem(
 
 "emailForSignIn"
 
 );
+
 
 
 
@@ -369,7 +422,10 @@ email = prompt(
 
 
 
+
+
 try{
+
 
 
 let result =
@@ -388,6 +444,7 @@ window.location.href
 
 
 
+
 await deviceLock(
 
 result.user.uid,
@@ -399,7 +456,9 @@ email
 
 
 
+
 openCalculator();
+
 
 
 
@@ -421,23 +480,13 @@ alert(e.message);
 
 }
 
-
-
-
-
-
-
-
-
 // Calculator
-
 
 function calculate(){
 
 
 
 let total =
-
 
 (
 Number(
@@ -447,19 +496,23 @@ document.getElementById("sku1").value
 Number(
 document.getElementById("bags1").value || 0
 )
-)
 
+)
 
 +
 
 (
+
 Number(
 document.getElementById("sku2").value
 )
+
 *
+
 Number(
 document.getElementById("bags2").value || 0
 )
+
 );
 
 
@@ -470,7 +523,7 @@ document
 .getElementById("totalWeight")
 .innerHTML =
 
-total.toFixed(3)+" KG";
+total.toFixed(3) + " KG";
 
 
 
@@ -501,9 +554,7 @@ document.getElementById("bags2").value || 0
 
 
 
-
-// Auto Calculation
-
+// Auto Calculate
 
 document
 .getElementById("sku1")
@@ -532,8 +583,7 @@ document
 
 
 
-// Reset
-
+// Reset Button
 
 document
 .getElementById("resetBtn")
@@ -542,12 +592,14 @@ document
 
 document
 .getElementById("bags1")
-.value="";
+.value = "";
+
 
 
 document
 .getElementById("bags2")
-.value="";
+.value = "";
+
 
 
 calculate();
@@ -563,6 +615,6 @@ calculate();
 
 
 
-// Start Check
+// Start Email Check
 
 checkEmail();
