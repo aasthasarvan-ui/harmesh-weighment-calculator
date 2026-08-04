@@ -1,27 +1,41 @@
 import { auth, database } from "./firebase.js";
 
+
 import {
+
 sendSignInLinkToEmail,
 isSignInWithEmailLink,
 signInWithEmailLink
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
+
 import {
+
 ref,
-get,
-set
+set,
+get
+
 }
+
 from
+
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 
 
+
+// GitHub URL
+
 const actionCodeSettings = {
 
 url:
+
 "https://aasthasarvan-ui.github.io/harmesh-weighment-calculator/",
 
 handleCodeInApp:true
@@ -30,9 +44,18 @@ handleCodeInApp:true
 
 
 
-// Open Calculator
+
+// Backup PIN
+
+const MASTER_PIN = "1234";
+
+
+
+
+// Screen Change
 
 function openCalculator(){
+
 
 document
 .getElementById("loginScreen")
@@ -43,7 +66,11 @@ document
 .getElementById("calculatorScreen")
 .classList.remove("hide");
 
+
 }
+
+
+
 
 
 
@@ -67,19 +94,23 @@ await get(deviceRef);
 
 
 
+
 if(data.exists()){
 
 
 if(data.val().deviceID !== deviceID){
 
+
 throw new Error(
-"Device not authorized"
+"Device Not Authorized"
 );
 
+
 }
 
 
 }
+
 else{
 
 
@@ -97,11 +128,18 @@ date:new Date().toString()
 }
 
 
+
 }
 
 
 
-// Email Send
+
+
+
+
+
+// Email Link Send
+
 
 document
 .getElementById("sendLinkBtn")
@@ -109,17 +147,18 @@ document
 
 
 let email =
-document.getElementById("email")
-.value
-.trim();
+document.getElementById("email").value.trim();
 
 
 
-if(!email){
+if(email===""){
+
 
 alert("Enter Email");
 
+
 return;
+
 
 }
 
@@ -141,93 +180,81 @@ actionCodeSettings
 
 
 localStorage.setItem(
+
 "emailForSignIn",
+
 email
+
 );
+
 
 
 document.getElementById("loginMessage")
 .innerHTML =
-"Verification link sent";
+"Email link sent. Check your mail";
 
 
 }
 
-catch(e){
+catch(error){
 
-alert(e.message);
+
+alert(error.message);
+
 
 }
 
 
 };
 
-// PIN Login (Firebase settings/pin)
+
+
+
+
+
+
+
+// PIN Login
+
 
 document
 .getElementById("pinBtn")
 .onclick = async ()=>{
 
 
-let enteredPIN =
+let pin =
+document.getElementById("pin").value;
 
-document
-.getElementById("pin")
-.value
-.trim();
 
+
+if(pin === MASTER_PIN){
 
 
 try{
-
-
-let rootRef = ref(database);
-
-
-let snap = await get(rootRef);
-
-
-
-if(!snap.exists()){
-
-alert("Database empty");
-
-return;
-
-}
-
-
-
-let data = snap.val();
-
-
-
-let savedPIN =
-
-String(
-data.settings.pin
-)
-.trim();
-
-
-
-
-
-if(enteredPIN === savedPIN){
-
 
 
 await deviceLock(
 
 "pin_device",
 
-"PIN LOGIN"
+"PIN Login"
 
 );
 
 
 
 openCalculator();
+
+
+}
+
+catch(e){
+
+
+alert(e.message);
+
+
+}
 
 
 
@@ -243,17 +270,6 @@ alert("Wrong PIN");
 
 
 
-}
-
-catch(e){
-
-
-alert("PIN Error: " + e.message);
-
-
-}
-
-
 };
 
 
@@ -262,9 +278,12 @@ alert("PIN Error: " + e.message);
 
 
 
-// Email Link Verify
+
+// Email Verification Check
+
 
 async function checkEmail(){
+
 
 
 if(
@@ -282,7 +301,6 @@ window.location.href
 
 
 let email =
-
 localStorage.getItem(
 "emailForSignIn"
 );
@@ -291,10 +309,15 @@ localStorage.getItem(
 
 if(!email){
 
+
 email =
-prompt("Enter Email");
+prompt(
+"Enter Email"
+);
+
 
 }
+
 
 
 
@@ -333,17 +356,19 @@ openCalculator();
 
 catch(e){
 
+
 alert(e.message);
 
+
+}
+
+
+
 }
 
 
 
 }
-
-
-}
-
 
 
 
@@ -353,6 +378,7 @@ alert(e.message);
 
 
 // Calculator
+
 
 function calculate(){
 
@@ -383,11 +409,13 @@ document.getElementById("bags2").value || 0
 
 
 
+
 document
 .getElementById("totalWeight")
 .innerHTML =
 
 total.toFixed(3)+" KG";
+
 
 
 
@@ -415,24 +443,26 @@ document.getElementById("bags2").value || 0
 
 
 
+
+
 document
 .getElementById("sku1")
-.onchange = calculate;
+.onchange=calculate;
 
 
 document
 .getElementById("sku2")
-.onchange = calculate;
+.onchange=calculate;
 
 
 document
 .getElementById("bags1")
-.oninput = calculate;
+.oninput=calculate;
 
 
 document
 .getElementById("bags2")
-.oninput = calculate;
+.oninput=calculate;
 
 
 
@@ -440,22 +470,17 @@ document
 
 
 
-// Reset Button
+// Reset
+
 
 document
 .getElementById("resetBtn")
-.onclick = ()=>{
+.onclick=()=>{
 
 
-document
-.getElementById("bags1")
-.value="";
+document.getElementById("bags1").value="";
 
-
-document
-.getElementById("bags2")
-.value="";
-
+document.getElementById("bags2").value="";
 
 calculate();
 
@@ -468,18 +493,4 @@ calculate();
 
 
 
-// Start
-
 checkEmail();
-
-
-
-// Service Worker
-
-if("serviceWorker" in navigator){
-
-navigator.serviceWorker.register(
-"service-worker.js"
-);
-
-}
