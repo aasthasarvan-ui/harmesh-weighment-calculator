@@ -35,8 +35,7 @@ handleCodeInApp:true
 
 // Backup PIN
 
-const MASTER_PIN = "1234";
-
+const MASTER_PIN = atob("MTIzNA==");
 
 
 
