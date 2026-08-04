@@ -1,35 +1,21 @@
-﻿import { 
-auth,
-database
-} from "./firebase.js";
-
+import { auth, database } from "./firebase.js";
 
 import {
-
 sendSignInLinkToEmail,
 isSignInWithEmailLink,
 signInWithEmailLink
-
 }
-
 from
-
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
 import {
-
 ref,
 set,
 get
-
 }
-
 from
-
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-
 
 
 
@@ -46,39 +32,96 @@ handleCodeInApp:true
 
 
 
+// Backup PIN
 
-
-// Elements
-
-const loginScreen =
-document.getElementById("loginScreen");
-
-
-const calculatorScreen =
-document.getElementById("calculatorScreen");
-
-
-const loadingScreen =
-document.getElementById("loadingScreen");
+const MASTER_PIN = "1234";
 
 
 
 
+// Open Calculator
 
-const emailBox =
-document.getElementById("email");
+function openCalculator(){
+
+document.getElementById("loadingScreen")
+.classList.add("hide");
 
 
-const message =
-document.getElementById("loginMessage");
+document.getElementById("loginScreen")
+.classList.add("hide");
 
+
+document.getElementById("calculatorScreen")
+.classList.remove("hide");
+
+}
 
 
 
 
 
+// Device Lock Function
 
-// Send Email Link
+async function deviceLock(uid,email){
+
+
+let deviceID =
+btoa(navigator.userAgent);
+
+
+
+let deviceRef =
+ref(database,"devices/"+uid);
+
+
+
+let data =
+await get(deviceRef);
+
+
+
+if(data.exists()){
+
+
+if(data.val().deviceID !== deviceID){
+
+throw new Error(
+"This device is not authorized"
+);
+
+}
+
+
+}
+
+else{
+
+
+await set(deviceRef,{
+
+email:email,
+
+deviceID:deviceID,
+
+date:new Date().toString()
+
+});
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+// Email Link Send
+
 
 document
 .getElementById("sendLinkBtn")
@@ -86,13 +129,12 @@ document
 
 
 let email =
-emailBox.value.trim();
+document.getElementById("email").value.trim();
 
 
 if(!email){
 
-message.innerHTML =
-"Enter email address";
+alert("Enter Email");
 
 return;
 
@@ -125,17 +167,16 @@ email
 
 
 
-message.innerHTML =
-
+document.getElementById("loginMessage")
+.innerHTML =
 "Verification link sent. Check your email";
 
 
 }
 
-catch(error){
+catch(e){
 
-message.innerHTML =
-error.message;
+alert(e.message);
 
 }
 
@@ -149,7 +190,74 @@ error.message;
 
 
 
-// Check Email Login
+// PIN Login
+
+
+document
+.getElementById("pinBtn")
+.onclick = async ()=>{
+
+
+let pin =
+document.getElementById("pin").value;
+
+
+if(pin === MASTER_PIN){
+
+
+
+let uid = "pin_user";
+
+
+try{
+
+
+await deviceLock(
+
+uid,
+
+"PIN LOGIN"
+
+);
+
+
+
+openCalculator();
+
+
+}
+
+catch(e){
+
+alert(e.message);
+
+}
+
+
+
+}
+
+else{
+
+
+alert("Wrong PIN");
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+
+// Email Link Verify
 
 
 async function checkEmailLogin(){
@@ -157,9 +265,13 @@ async function checkEmailLogin(){
 
 
 if(
+
 isSignInWithEmailLink(
+
 auth,
+
 window.location.href
+
 )
 
 ){
@@ -181,12 +293,12 @@ prompt(
 "Enter your email"
 );
 
+
 }
 
 
 
 try{
-
 
 
 let result =
@@ -204,19 +316,6 @@ window.location.href
 
 
 
-
-localStorage.setItem(
-
-"emailForSignIn",
-
-email
-
-);
-
-
-
-
-
 await deviceLock(
 
 result.user.uid,
@@ -227,102 +326,16 @@ email
 
 
 
-
-
 openCalculator();
 
 
 
 }
 
-catch(error){
-
-alert(error.message);
-
-}
+catch(e){
 
 
-
-}
-
-else{
-
-
-loadingScreen.classList.add("hide");
-
-loginScreen.classList.remove("hide");
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-// Device Lock
-
-
-async function deviceLock(uid,email){
-
-
-
-let deviceID =
-
-btoa(
-
-navigator.userAgent
-
-);
-
-
-
-
-let deviceRef =
-
-ref(
-
-database,
-
-"devices/"+uid
-
-);
-
-
-
-let snapshot =
-
-await get(deviceRef);
-
-
-
-
-
-if(snapshot.exists()){
-
-
-
-let oldDevice =
-
-snapshot.val().deviceID;
-
-
-
-
-
-if(oldDevice !== deviceID){
-
-
-throw new Error(
-
-"This device is not authorized"
-
-);
+alert(e.message);
 
 
 }
@@ -334,22 +347,14 @@ throw new Error(
 else{
 
 
+document
+.getElementById("loadingScreen")
+.classList.add("hide");
 
-await set(
 
-deviceRef,
-
-{
-
-email:email,
-
-deviceID:deviceID,
-
-date:new Date().toString()
-
-}
-
-);
+document
+.getElementById("loginScreen")
+.classList.remove("hide");
 
 
 }
@@ -357,30 +362,6 @@ date:new Date().toString()
 
 
 }
-
-
-
-
-
-
-
-
-
-// Open Calculator
-
-
-function openCalculator(){
-
-
-loadingScreen.classList.add("hide");
-
-loginScreen.classList.add("hide");
-
-calculatorScreen.classList.remove("hide");
-
-
-}
-
 
 
 
@@ -394,9 +375,7 @@ calculatorScreen.classList.remove("hide");
 function calculate(){
 
 
-
 let total =
-
 
 
 (Number(
@@ -404,141 +383,4 @@ document.getElementById("sku1").value
 )
 *
 Number(
-document.getElementById("bags1").value || 0
-))
-
-
-+
-
-(Number(
-document.getElementById("sku2").value
-)
-*
-Number(
-document.getElementById("bags2").value || 0
-));
-
-
-
-
-
-document.getElementById("totalWeight")
-
-.innerHTML =
-
-total.toFixed(3)+" KG";
-
-
-
-
-
-document.getElementById("totalBags")
-
-.innerHTML =
-
-
-Number(
-document.getElementById("bags1").value || 0
-)
-
-+
-
-Number(
-document.getElementById("bags2").value || 0
-);
-
-
-
-}
-
-
-
-
-
-
-document
-.getElementById("sku1")
-.onchange=calculate;
-
-
-document
-.getElementById("sku2")
-.onchange=calculate;
-
-
-document
-.getElementById("bags1")
-.oninput=calculate;
-
-
-document
-.getElementById("bags2")
-.oninput=calculate;
-
-
-
-
-
-
-
-// Reset
-
-
-document
-.getElementById("resetBtn")
-.onclick=()=>{
-
-
-document.getElementById("bags1").value="";
-
-document.getElementById("bags2").value="";
-
-
-calculate();
-
-
-};
-
-// PIN Login Backup
-
-const MASTER_PIN = "1234";
-
-
-document
-.getElementById("pinBtn")
-.onclick = async ()=>{
-
-
-let pin =
-document.getElementById("pin").value;
-
-
-if(pin === MASTER_PIN){
-
-
-openCalculator();
-
-
-}
-else{
-
-
-alert("Wrong PIN");
-
-}
-
-
-};
-
-
-
-
-
-checkEmailLogin();
-if("serviceWorker" in navigator){
-
-navigator.serviceWorker.register(
-"service-worker.js"
-);
-
-}
+document.getElementById("bags1").value || 
