@@ -499,7 +499,36 @@ calculate();
 
 };
 
+// PIN Login Backup
 
+const MASTER_PIN = "1234";
+
+
+document
+.getElementById("pinBtn")
+.onclick = async ()=>{
+
+
+let pin =
+document.getElementById("pin").value;
+
+
+if(pin === MASTER_PIN){
+
+
+openCalculator();
+
+
+}
+else{
+
+
+alert("Wrong PIN");
+
+}
+
+
+};
 
 
 
