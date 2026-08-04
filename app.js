@@ -30,7 +30,6 @@ handleCodeInApp:true
 
 
 
-
 // Open Calculator
 
 function openCalculator(){
@@ -45,10 +44,6 @@ document
 .classList.remove("hide");
 
 }
-
-
-
-
 
 
 
@@ -67,15 +62,15 @@ ref(database,"devices/"+id);
 
 
 
-let snap =
+let data =
 await get(deviceRef);
 
 
 
-if(snap.exists()){
+if(data.exists()){
 
 
-if(snap.val().deviceID !== deviceID){
+if(data.val().deviceID !== deviceID){
 
 throw new Error(
 "Device not authorized"
@@ -85,7 +80,6 @@ throw new Error(
 
 
 }
-
 else{
 
 
@@ -107,13 +101,7 @@ date:new Date().toString()
 
 
 
-
-
-
-
-
-
-// Email Link Send
+// Email Send
 
 document
 .getElementById("sendLinkBtn")
@@ -122,7 +110,8 @@ document
 
 let email =
 document.getElementById("email")
-.value.trim();
+.value
+.trim();
 
 
 
@@ -133,6 +122,7 @@ alert("Enter Email");
 return;
 
 }
+
 
 
 try{
@@ -149,15 +139,14 @@ actionCodeSettings
 );
 
 
+
 localStorage.setItem(
 "emailForSignIn",
 email
 );
 
 
-
-document
-.getElementById("loginMessage")
+document.getElementById("loginMessage")
 .innerHTML =
 "Verification link sent";
 
@@ -173,15 +162,7 @@ alert(e.message);
 
 };
 
-
-
-
-
-
-
-
-
-// Firebase PIN Login
+// PIN Login (Firebase settings/pin)
 
 document
 .getElementById("pinBtn")
@@ -200,19 +181,16 @@ document
 try{
 
 
-let pinRef =
-ref(database,"settings/pin");
+let rootRef = ref(database);
 
 
-
-let snap =
-await get(pinRef);
+let snap = await get(rootRef);
 
 
 
 if(!snap.exists()){
 
-alert("PIN not found in Firebase");
+alert("Database empty");
 
 return;
 
@@ -220,9 +198,16 @@ return;
 
 
 
+let data = snap.val();
+
+
+
 let savedPIN =
 
-String(snap.val()).trim();
+String(
+data.settings.pin
+)
+.trim();
 
 
 
@@ -262,7 +247,9 @@ alert("Wrong PIN");
 
 catch(e){
 
-alert(e.message);
+
+alert("PIN Error: " + e.message);
+
 
 }
 
@@ -275,12 +262,9 @@ alert(e.message);
 
 
 
-
-
-// Email Verification
+// Email Link Verify
 
 async function checkEmail(){
-
 
 
 if(
@@ -354,6 +338,7 @@ alert(e.message);
 }
 
 
+
 }
 
 
@@ -398,13 +383,11 @@ document.getElementById("bags2").value || 0
 
 
 
-
 document
 .getElementById("totalWeight")
 .innerHTML =
 
 total.toFixed(3)+" KG";
-
 
 
 
@@ -425,9 +408,8 @@ document.getElementById("bags2").value || 0
 );
 
 
+
 }
-
-
 
 
 
@@ -458,7 +440,7 @@ document
 
 
 
-
+// Reset Button
 
 document
 .getElementById("resetBtn")
@@ -486,10 +468,13 @@ calculate();
 
 
 
+// Start
 
 checkEmail();
 
 
+
+// Service Worker
 
 if("serviceWorker" in navigator){
 
