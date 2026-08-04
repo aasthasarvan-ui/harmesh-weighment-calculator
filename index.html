@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Harmesh Weighment Calculator</title>
@@ -18,22 +19,7 @@
 <body>
 
 
-<div id="loadingScreen" class="screen">
-
-<div class="card">
-
-<h2>Loading...</h2>
-
-<p>Please wait</p>
-
-</div>
-
-</div>
-
-
-
-
-<div id="loginScreen" class="screen hide">
+<div id="loginScreen" class="screen">
 
 
 <div class="card">
@@ -41,41 +27,39 @@
 
 <h1>⚖️</h1>
 
-<h2>
-Weighment Calculator
-</h2>
+<h2>Weighment Calculator</h2>
 
 
 <p class="sub">
-Secure Login
+Login Required
 </p>
 
 
 
+
 <input
-
 type="email"
-
 id="email"
-
 placeholder="Enter Email Address">
 
 
 
 <button id="sendLinkBtn">
 
-Send Verification Link
+Send Email Verification Link
 
 </button>
 
 
 
+
+
 <hr>
 
-
-<p style="text-align:center">
+<p style="text-align:center;">
 OR
 </p>
+
 
 
 
@@ -86,7 +70,6 @@ type="password"
 id="pin"
 
 placeholder="Enter PIN">
-
 
 
 <button id="pinBtn">
@@ -103,7 +86,6 @@ Open With PIN
 </div>
 
 </div>
-
 
 
 
@@ -129,11 +111,9 @@ Weighment Calculator
 
 <select id="sku1">
 
-
 <option value="50.120">
 50.120 KG
 </option>
-
 
 <option value="25.120">
 25.120 KG
@@ -154,6 +134,8 @@ placeholder="Bags 1">
 
 
 </div>
+
+
 
 
 
@@ -198,16 +180,16 @@ placeholder="Bags 2">
 <div class="result">
 
 
-<h3>
 Total Weight
-</h3>
+
+<br>
 
 
-<div id="totalWeight">
+<b id="totalWeight">
 
 0.000 KG
 
-</div>
+</b>
 
 
 </div>
@@ -221,14 +203,15 @@ Total Weight
 
 Total Bags :
 
-<span id="totalBags">
+<b id="totalBags">
 
 0
 
-</span>
+</b>
 
 
 </div>
+
 
 
 
@@ -258,6 +241,8 @@ RESET
 All Rights Reserved
 
 </footer>
+
+
 
 
 
